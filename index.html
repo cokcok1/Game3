@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聖經人物競猜：我是誰？</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #e67e22;
+            --bg-color: #f4f6f7;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .game-container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 { margin-bottom: 10px; font-size: 1.8rem; }
+        .score-board { font-size: 1.2rem; color: var(--accent-color); font-weight: bold; margin-bottom: 20px; }
+        
+        .progress { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 20px; }
+
+        .clue-box {
+            background-color: #ecf0f1;
+            border-left: 5px solid var(--accent-color);
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+            border-radius: 4px;
+            display: none; /* 預設隱藏 */
+            animation: fadeIn 0.5s;
+        }
+
+        .clue-box.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .controls { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
+
+        input[type="text"] {
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        input[type="text"]:focus { border-color: var(--accent-color); }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .btn-hint { background-color: #3498db; color: white; }
+        .btn-submit { background-color: #27ae60; color: white; }
+        .btn-next { background-color: var(--primary-color); color: white; display: none; }
+
+        button:hover { opacity: 0.9; transform: scale(1.02); }
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+
+        .message { margin-top: 15px; font-weight: bold; min-height: 24px; }
+        .correct { color: #27ae60; }
+        .wrong { color: #c0392b; }
+
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>聖經人物競猜</h1>
+    <div class="score-board">得分: <span id="score">0</span></div>
+    <div class="progress">題目: <span id="current-q">1</span> / 20</div>
+
+    <div id="clues-container">
+        </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="controls">
+        <button id="btn-hint" class="btn-hint" onclick="showNextClue()">🔍 顯示下一個線索 (-10分)</button>
+        <input type="text" id="answer-input" placeholder="輸入聖經人物名字 (例如: 彼得)">
+        <button id="btn-submit" class="btn-submit" onclick="checkAnswer()">提交答案</button>
+        <button id="btn-next" class="btn-next" onclick="nextQuestion()">下一題 ➔</button>
+    </div>
+</div>
+
+<script>
+    // 資料庫：由用戶提供的20位人物
+    const gameData = [
+        { name: "耶穌", full: "耶穌基督", clues: ["降生於伯利恆的馬槽中", "在約旦河受約翰的洗禮", "曠野禁食四十天戰勝試探", "登山寶訓教導天國八福", "被釘十字架後三天復活"] },
+        { name: "彼得", full: "彼得", clues: ["撇下漁網跟隨耶穌得人如魚", "信心不足在水面行走時下沉", "認耶穌是永生神的兒子", "雞叫前三次不認主", "五旬節講道三千人悔改"] },
+        { name: "保羅", full: "保羅", clues: ["早期激烈逼迫基督徒", "大馬色路上被光照瞎眼悔改", "三次海外傳道建立多間教會", "撰寫新約聖經多卷書信", "最終在羅馬為主殉道"] },
+        { name: "約翰", full: "使徒約翰", clues: ["被稱為主所愛的門徒", "受託照顧耶穌的母親馬利亞", "被流放拔摩島見末世異象", "寫下啟示錄預言新天新地", "晚年強調彼此相愛的命令"] },
+        { name: "馬利亞", full: "耶穌母親馬利亞", clues: ["聖靈感孕生下耶穌", "在迦拿婚宴求耶穌幫助", "在十字架下看著耶穌受難", "耶穌升天後與門徒恆切禱告", "尊主為大發出讚美詩歌"] },
+        { name: "施洗約翰", full: "施洗約翰", clues: ["在曠野傳悔改的洗禮", "身穿駱駝毛吃蝗蟲野蜜", "為耶穌施洗見證聖靈降下", "指責希律王而被下在監裡", "殉道被斬首在盤子上"] },
+        { name: "馬太", full: "馬太", clues: ["原為稅吏被耶穌呼召", "在家設宴款待耶穌和罪人", "被列為十二使徒之一", "撰寫馬太福音", "主要向猶太人傳揚福音"] },
+        { name: "猶大", full: "加略人猶大", clues: ["負責管理門徒的錢囊", "以三十塊銀錢出賣耶穌", "最後晚餐與主同蘸餅", "用親嘴暗號指出耶穌", "心生懊悔出去吊死"] },
+        { name: "多馬", full: "多馬", clues: ["曾言願與主同去死", "懷疑耶穌復活的真實性", "探入耶穌肋旁傷口才信", "喊出「我的主！我的神！」", "傳說往印度傳道並殉道"] },
+        { name: "路加", full: "路加", clues: ["職業是受人敬重的醫生", "跟隨保羅四處傳道", "詳細考察寫下路加福音", "記錄使徒行傳教會歷史", "敘事嚴謹重視歷史細節"] },
+        { name: "馬可", full: "馬可", clues: ["母親家是早期信徒聚會處", "首次傳道半途離開保羅", "被視為彼得的口述記錄者", "寫下最早成的馬可福音", "晚年被保羅稱讚於事工有益"] },
+        { name: "司提反", full: "司提反", clues: ["首批被選出的教會七執事", "滿有恩惠能力行大奇事", "在公會引經據典申辯真理", "看見天開耶穌站神右邊", "被石頭打死成為首位殉道者"] },
+        { name: "抹大拉的馬利亞", full: "抹大拉的馬利亞", clues: ["曾被耶穌趕出身上七個鬼", "用財物供給耶穌傳道", "遠遠觀看耶穌被釘死", "清晨第一位來到墳墓", "首位看見復活的主"] },
+        { name: "巴拿巴", full: "巴拿巴", clues: ["賣田產將價銀交給使徒", "被稱為「勸慰子」善於鼓勵", "接待悔改後的保羅引薦給使徒", "被派往安提阿牧養教會", "為帶馬可與保羅分道揚鑣"] },
+        { name: "提摩太", full: "提摩太", clues: ["母親是猶太人父親是希臘人", "被保羅視為福音的兒子", "順服保羅接受割禮", "年輕時牧養以弗所教會", "接收保羅的兩封教牧書信"] },
+        { name: "雅各", full: "西庇太的兒子雅各", clues: ["性情剛烈被稱為「雷子」", "登山變像的三見證人之一", "客西馬尼園隨主警醒禱告", "曾求火燒撒馬利亞村莊", "十二使徒中首位殉道者"] },
+        { name: "拉撒路", full: "拉撒路", clues: ["耶穌素來愛他和他的姊妹", "患病死去埋葬四天", "聽主呼喚從死裡復活", "復活後與主同席吃飯", "祭司長因他想殺耶穌"] },
+        { name: "撒该", full: "撒该", clues: ["身量矮小爬上桑樹看耶穌", "富有的稅吏長", "歡喜接待耶穌到家裡", "願償還被訛詐者四倍", "耶穌宣告救恩臨到他家"] },
+        { name: "彼拉多", full: "本丟彼拉多", clues: ["羅馬巡撫負責審判耶穌", "妻子勸不可管義人的事", "洗手表明流血與己無關", "釋放強盜巴拉巴", "最終屈從民意將耶穌釘死"] },
+        { name: "尼哥底母", full: "尼哥底母", clues: ["猶太人的官和法利賽人", "夜裡來問耶穌重生之道", "在公會前為耶穌辯護", "帶一百斤香料膏耶穌", "協助約瑟安葬耶穌身體"] }
+    ];
+
+    let currentQIndex = 0;
+    let revealedClues = 1;
+    let score = 0;
+    let isAnswered = false;
+
+    // 初始化遊戲
+    function initGame() {
+        // 洗牌 (Fisher-Yates Shuffle) - 每次玩順序都不同
+        for (let i = gameData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [gameData[i], gameData[j]] = [gameData[j], gameData[i]];
+        }
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        isAnswered = false;
+        revealedClues = 1;
+        
+        // 更新 UI
+        document.getElementById('current-q').innerText = currentQIndex + 1;
+        document.getElementById('message').innerText = "";
+        document.getElementById('answer-input').value = "";
+        document.getElementById('answer-input').disabled = false;
+        document.getElementById('btn-submit').style.display = 'block';
+        document.getElementById('btn-hint').disabled = false;
+        document.getElementById('btn-next').style.display = 'none';
+        
+        // 渲染線索
+        const container = document.getElementById('clues-container');
+        container.innerHTML = '';
+        const currentData = gameData[currentQIndex];
+        
+        currentData.clues.forEach((clue, index) => {
+            const div = document.createElement('div');
+            div.className = 'clue-box';
+            div.innerText = `線索 ${index + 1}: ${clue}`;
+            if (index === 0) div.classList.add('active'); // 預設顯示第一條
+            container.appendChild(div);
+        });
+    }
+
+    function showNextClue() {
+        if (revealedClues < 5) {
+            const clues = document.querySelectorAll('.clue-box');
+            clues[revealedClues].classList.add('active');
+            revealedClues++;
+            
+            // 滾動到底部
+            const container = document.getElementById('clues-container');
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        if (revealedClues === 5) {
+            document.getElementById('btn-hint').disabled = true;
+            document.getElementById('btn-hint').innerText = "已顯示所有線索";
+        }
+    }
+
+    function checkAnswer() {
+        const input = document.getElementById('answer-input').value.trim();
+        if (!input) return;
+
+        const currentData = gameData[currentQIndex];
+        const correctName = currentData.name;
+        
+        // 模糊比對：只要輸入包含關鍵字就算對 (例如輸入 "使徒約翰" 對應 "約翰")
+        // 或輸入 "彼拉多" 對應 "本丟彼拉多"
+        if (input.includes(correctName) || correctName.includes(input)) {
+            // 計算得分：50 - (已開線索-1)*10
+            // 1個線索=50, 2個=40, 3個=30, 4個=20, 5個=10
+            const pointsEarned = 60 - (revealedClues * 10);
+            score += pointsEarned;
+            
+            document.getElementById('score').innerText = score;
+            document.getElementById('message').className = "message correct";
+            document.getElementById('message').innerText = `✅ 答對了！答案是「${currentData.full}」。獲得 ${pointsEarned} 分！`;
+            endTurn();
+        } else {
+            document.getElementById('message').className = "message wrong";
+            document.getElementById('message').innerText = "❌ 答案不對，再試試看，或者看下一個線索。";
+        }
+    }
+
+    function endTurn() {
+        isAnswered = true;
+        document.getElementById('answer-input').disabled = true;
+        document.getElementById('btn-submit').style.display = 'none';
+        document.getElementById('btn-hint').disabled = true;
+        document.getElementById('btn-next').style.display = 'block';
+
+        // 顯示所有未顯示的線索供學習
+        const clues = document.querySelectorAll('.clue-box');
+        clues.forEach(c => c.classList.add('active'));
+    }
+
+    function nextQuestion() {
+        if (currentQIndex < gameData.length - 1) {
+            currentQIndex++;
+            document.getElementById('btn-hint').innerText = "🔍 顯示下一個線索 (-10分)";
+            loadQuestion();
+        } else {
+            document.querySelector('.game-container').innerHTML = `
+                <h1>遊戲結束！</h1>
+                <p>你的總分是：</p>
+                <div style="font-size: 3rem; color: #e67e22; font-weight: bold;">${score}</div>
+                <p>感謝遊玩！</p>
+                <button onclick="location.reload()" class="btn-submit">再玩一次</button>
+            `;
+        }
+    }
+
+    // 支援按 Enter 提交
+    document.getElementById('answer-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter' && !isAnswered) {
+            checkAnswer();
+        }
+    });
+
+    // 啟動
+    initGame();
+
+</script>
+
+</body>
+</html>
