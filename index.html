@@ -3,136 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聖經人物競猜：我是誰？</title>
+    <title>聖經人物猜猜樂！</title>
     <style>
+        /* 兒童風格配色 */
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #e67e22;
-            --bg-color: #f4f6f7;
-            --card-bg: #ffffff;
+            --bg-color: #e0f7fa; /* 粉藍背景 */
+            --container-bg: #ffffff;
+            --primary-color: #4fc3f7; /* 主色調：亮藍 */
+            --accent-color: #ffb74d; /* 強調色：暖橘 */
+            --text-color: #546e7a;
+            --success-color: #81c784;
+            --wrong-color: #e57373;
+            --card-shadow: 0 8px 16px rgba(79, 195, 247, 0.2);
         }
 
         body {
-            font-family: "Microsoft JhengHei", sans-serif;
+            font-family: "Comic Sans MS", "Microsoft JhengHei", sans-serif; /* 嘗試使用可愛字體 */
             background-color: var(--bg-color);
-            color: var(--primary-color);
+            background-image: radial-gradient(#ffffff 20%, transparent 20%), radial-gradient(#ffffff 20%, transparent 20%);
+            background-position: 0 0, 50px 50px;
+            background-size: 100px 100px; /* 增加可愛波點背景 */
+            color: var(--text-color);
             display: flex;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            box-sizing: border-box;
         }
 
         .game-container {
-            background-color: var(--card-bg);
+            background-color: var(--container-bg);
             width: 100%;
-            max-width: 600px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 650px;
+            border-radius: 30px; /* 超大圓角 */
+            border: 5px solid #b3e5fc;
+            box-shadow: var(--card-shadow);
             padding: 30px;
             text-align: center;
+            position: relative;
         }
 
-        h1 { margin-bottom: 10px; font-size: 1.8rem; }
-        .score-board { font-size: 1.2rem; color: var(--accent-color); font-weight: bold; margin-bottom: 20px; }
-        
-        .progress { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 20px; }
+        h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px #b3e5fc;
+        }
 
-        .clue-box {
-            background-color: #ecf0f1;
-            border-left: 5px solid var(--accent-color);
+        .status-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-color: #fff9c4; /* 淡黃色背景 */
+            padding: 10px;
+            border-radius: 20px;
+        }
+
+        .score-box { color: var(--accent-color); }
+        .progress-box { color: var(--primary-color); }
+
+        .clues-area {
+            background-color: #f0faff;
+            border-radius: 20px;
+            padding: 20px;
+            min-height: 150px;
+            margin-bottom: 20px;
+            border: 3px dashed #b3e5fc;
+        }
+
+        .clue-card {
+            background-color: #fff;
+            border-left: 8px solid var(--accent-color);
             padding: 15px;
             margin: 10px 0;
             text-align: left;
-            border-radius: 4px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             display: none; /* 預設隱藏 */
-            animation: fadeIn 0.5s;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* 彈跳效果 */
         }
 
-        .clue-box.active { display: block; }
+        .clue-card.active { display: block; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        .controls { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
-
-        input[type="text"] {
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid #bdc3c7;
-            border-radius: 8px;
-            outline: none;
+        /* 答案卡片區域 */
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* 自動適應排列 */
+            gap: 15px;
+            margin-top: 25px;
         }
 
-        input[type="text"]:focus { border-color: var(--accent-color); }
-
-        button {
-            padding: 12px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.2s;
+        .answer-card {
+            background-color: white;
+            border: 4px solid #b3e5fc;
+            color: var(--text-color);
+            padding: 15px 5px;
+            font-size: 1.1rem;
             font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 5px 0 #81d4fa; /* 立體按鈕效果 */
         }
 
-        .btn-hint { background-color: #3498db; color: white; }
-        .btn-submit { background-color: #27ae60; color: white; }
-        .btn-next { background-color: var(--primary-color); color: white; display: none; }
+        .answer-card:hover:not(:disabled) {
+            transform: translateY(-3px);
+            background-color: #e1f5fe;
+        }
+        
+        .answer-card:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #81d4fa;
+        }
 
-        button:hover { opacity: 0.9; transform: scale(1.02); }
-        button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        .answer-card:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: translateY(5px); border-color: #cfd8dc; color: #b0bec5;
+        }
+        
+        /* 答對答錯的樣式 */
+        .answer-card.correct-answer {
+            background-color: var(--success-color) !important;
+            color: white !important;
+            border-color: #66bb6a !important;
+            box-shadow: 0 5px 0 #43a047 !important;
+        }
+        .answer-card.wrong-answer {
+            background-color: var(--wrong-color) !important;
+            color: white !important;
+            border-color: #ef5350 !important;
+             box-shadow: 0 5px 0 #e53935 !important;
+        }
 
-        .message { margin-top: 15px; font-weight: bold; min-height: 24px; }
-        .correct { color: #27ae60; }
-        .wrong { color: #c0392b; }
+        /* 控制按鈕區域 */
+        .controls { margin-top: 25px; }
+
+        .btn-action {
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+            font-family: inherit;
+        }
+        .btn-action:active { transform: translateY(3px); box-shadow: none; }
+
+        .btn-hint { background-color: var(--accent-color); color: white; box-shadow: 0 5px 0 #fb8c00; }
+        .btn-next { background-color: var(--primary-color); color: white; box-shadow: 0 5px 0 #0288d1; display: none; margin: 0 auto;}
+        .btn-hint:disabled { background-color: #cfd8dc; color: #90a4ae; box-shadow: none; transform: translateY(3px);}
+
+        .message { margin-top: 15px; font-weight: bold; font-size: 1.2rem; min-height: 30px; }
+        .correct-msg { color: var(--success-color); }
+        .wrong-msg { color: var(--wrong-color); }
+
+        /* 水印 */
+        .watermark {
+            position: fixed;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: rgba(84, 110, 122, 0.6);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 10px;
+            pointer-events: none; /* 讓點擊穿透 */
+        }
 
     </style>
 </head>
 <body>
 
 <div class="game-container">
-    <h1>聖經人物競猜</h1>
-    <div class="score-board">得分: <span id="score">0</span></div>
-    <div class="progress">題目: <span id="current-q">1</span> / 20</div>
+    <h1>✨ 聖經人物猜猜樂 ✨</h1>
+    <div class="status-bar">
+        <div class="score-box">⭐ 得分: <span id="score">0</span></div>
+        <div class="progress-box">🚀 題目: <span id="current-q">1</span> / 20</div>
+    </div>
 
-    <div id="clues-container">
+    <div class="clues-area" id="clues-container">
         </div>
 
     <div class="message" id="message"></div>
+    
+    <div class="answers-grid" id="answers-container">
+        </div>
 
     <div class="controls">
-        <button id="btn-hint" class="btn-hint" onclick="showNextClue()">🔍 顯示下一個線索 (-10分)</button>
-        <input type="text" id="answer-input" placeholder="輸入聖經人物名字 (例如: 彼得)">
-        <button id="btn-submit" class="btn-submit" onclick="checkAnswer()">提交答案</button>
-        <button id="btn-next" class="btn-next" onclick="nextQuestion()">下一題 ➔</button>
+        <button id="btn-hint" class="btn-action btn-hint" onclick="showNextClue()">🔍 顯示下一個線索 (-10分)</button>
+        <button id="btn-next" class="btn-action btn-next" onclick="nextQuestion()">下一題 ➔</button>
     </div>
 </div>
 
+<div class="watermark" id="watermark"></div>
+
 <script>
-    // 資料庫：由用戶提供的20位人物
+    // 資料庫 (維持不變)
     const gameData = [
         { name: "耶穌", full: "耶穌基督", clues: ["降生於伯利恆的馬槽中", "在約旦河受約翰的洗禮", "曠野禁食四十天戰勝試探", "登山寶訓教導天國八福", "被釘十字架後三天復活"] },
-        { name: "彼得", full: "彼得", clues: ["撇下漁網跟隨耶穌得人如魚", "信心不足在水面行走時下沉", "認耶穌是永生神的兒子", "雞叫前三次不認主", "五旬節講道三千人悔改"] },
-        { name: "保羅", full: "保羅", clues: ["早期激烈逼迫基督徒", "大馬色路上被光照瞎眼悔改", "三次海外傳道建立多間教會", "撰寫新約聖經多卷書信", "最終在羅馬為主殉道"] },
+        { name: "彼得", full: "西門彼得", clues: ["撇下漁網跟隨耶穌得人如魚", "信心不足在水面行走時下沉", "認耶穌是永生神的兒子", "雞叫前三次不認主", "五旬節講道三千人悔改"] },
+        { name: "保羅", full: "使徒保羅", clues: ["早期激烈逼迫基督徒", "大馬色路上被光照瞎眼悔改", "三次海外傳道建立多間教會", "撰寫新約聖經多卷書信", "最終在羅馬為主殉道"] },
         { name: "約翰", full: "使徒約翰", clues: ["被稱為主所愛的門徒", "受託照顧耶穌的母親馬利亞", "被流放拔摩島見末世異象", "寫下啟示錄預言新天新地", "晚年強調彼此相愛的命令"] },
         { name: "馬利亞", full: "耶穌母親馬利亞", clues: ["聖靈感孕生下耶穌", "在迦拿婚宴求耶穌幫助", "在十字架下看著耶穌受難", "耶穌升天後與門徒恆切禱告", "尊主為大發出讚美詩歌"] },
         { name: "施洗約翰", full: "施洗約翰", clues: ["在曠野傳悔改的洗禮", "身穿駱駝毛吃蝗蟲野蜜", "為耶穌施洗見證聖靈降下", "指責希律王而被下在監裡", "殉道被斬首在盤子上"] },
-        { name: "馬太", full: "馬太", clues: ["原為稅吏被耶穌呼召", "在家設宴款待耶穌和罪人", "被列為十二使徒之一", "撰寫馬太福音", "主要向猶太人傳揚福音"] },
+        { name: "馬太", full: "稅吏馬太", clues: ["原為稅吏被耶穌呼召", "在家設宴款待耶穌和罪人", "被列為十二使徒之一", "撰寫馬太福音", "主要向猶太人傳揚福音"] },
         { name: "猶大", full: "加略人猶大", clues: ["負責管理門徒的錢囊", "以三十塊銀錢出賣耶穌", "最後晚餐與主同蘸餅", "用親嘴暗號指出耶穌", "心生懊悔出去吊死"] },
         { name: "多馬", full: "多馬", clues: ["曾言願與主同去死", "懷疑耶穌復活的真實性", "探入耶穌肋旁傷口才信", "喊出「我的主！我的神！」", "傳說往印度傳道並殉道"] },
-        { name: "路加", full: "路加", clues: ["職業是受人敬重的醫生", "跟隨保羅四處傳道", "詳細考察寫下路加福音", "記錄使徒行傳教會歷史", "敘事嚴謹重視歷史細節"] },
+        { name: "路加", full: "醫生路加", clues: ["職業是受人敬重的醫生", "跟隨保羅四處傳道", "詳細考察寫下路加福音", "記錄使徒行傳教會歷史", "敘事嚴謹重視歷史細節"] },
         { name: "馬可", full: "馬可", clues: ["母親家是早期信徒聚會處", "首次傳道半途離開保羅", "被視為彼得的口述記錄者", "寫下最早成的馬可福音", "晚年被保羅稱讚於事工有益"] },
         { name: "司提反", full: "司提反", clues: ["首批被選出的教會七執事", "滿有恩惠能力行大奇事", "在公會引經據典申辯真理", "看見天開耶穌站神右邊", "被石頭打死成為首位殉道者"] },
         { name: "抹大拉的馬利亞", full: "抹大拉的馬利亞", clues: ["曾被耶穌趕出身上七個鬼", "用財物供給耶穌傳道", "遠遠觀看耶穌被釘死", "清晨第一位來到墳墓", "首位看見復活的主"] },
         { name: "巴拿巴", full: "巴拿巴", clues: ["賣田產將價銀交給使徒", "被稱為「勸慰子」善於鼓勵", "接待悔改後的保羅引薦給使徒", "被派往安提阿牧養教會", "為帶馬可與保羅分道揚鑣"] },
-        { name: "提摩太", full: "提摩太", clues: ["母親是猶太人父親是希臘人", "被保羅視為福音的兒子", "順服保羅接受割禮", "年輕時牧養以弗所教會", "接收保羅的兩封教牧書信"] },
+        { name: "提摩太", full: "年輕的提摩太", clues: ["母親是猶太人父親是希臘人", "被保羅視為福音的兒子", "順服保羅接受割禮", "年輕時牧養以弗所教會", "接收保羅的兩封教牧書信"] },
         { name: "雅各", full: "西庇太的兒子雅各", clues: ["性情剛烈被稱為「雷子」", "登山變像的三見證人之一", "客西馬尼園隨主警醒禱告", "曾求火燒撒馬利亞村莊", "十二使徒中首位殉道者"] },
         { name: "拉撒路", full: "拉撒路", clues: ["耶穌素來愛他和他的姊妹", "患病死去埋葬四天", "聽主呼喚從死裡復活", "復活後與主同席吃飯", "祭司長因他想殺耶穌"] },
-        { name: "撒该", full: "撒该", clues: ["身量矮小爬上桑樹看耶穌", "富有的稅吏長", "歡喜接待耶穌到家裡", "願償還被訛詐者四倍", "耶穌宣告救恩臨到他家"] },
-        { name: "彼拉多", full: "本丟彼拉多", clues: ["羅馬巡撫負責審判耶穌", "妻子勸不可管義人的事", "洗手表明流血與己無關", "釋放強盜巴拉巴", "最終屈從民意將耶穌釘死"] },
+        { name: "撒该", full: "稅吏長撒该", clues: ["身量矮小爬上桑樹看耶穌", "富有的稅吏長", "歡喜接待耶穌到家裡", "願償還被訛詐者四倍", "耶穌宣告救恩臨到他家"] },
+        { name: "彼拉多", full: "巡撫彼拉多", clues: ["羅馬巡撫負責審判耶穌", "妻子勸不可管義人的事", "洗手表明流血與己無關", "釋放強盜巴拉巴", "最終屈從民意將耶穌釘死"] },
         { name: "尼哥底母", full: "尼哥底母", clues: ["猶太人的官和法利賽人", "夜裡來問耶穌重生之道", "在公會前為耶穌辯護", "帶一百斤香料膏耶穌", "協助約瑟安葬耶穌身體"] }
     ];
 
@@ -140,10 +240,19 @@
     let revealedClues = 1;
     let score = 0;
     let isAnswered = false;
+    let currentOptions = []; // 儲存當前題目的5個選項
+
+    // 初始化水印日期
+    function initWatermark() {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('zh-HK', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        document.getElementById('watermark').innerText = `Ver: 1.2 (Kids Edition) | Date: ${dateStr}`;
+    }
 
     // 初始化遊戲
     function initGame() {
-        // 洗牌 (Fisher-Yates Shuffle) - 每次玩順序都不同
+        initWatermark();
+        // 洗牌 (Fisher-Yates Shuffle)
         for (let i = gameData.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [gameData[i], gameData[j]] = [gameData[j], gameData[i]];
@@ -151,42 +260,78 @@
         loadQuestion();
     }
 
+    // 準備選項卡片 (核心新邏輯)
+    function prepareOptions(targetPerson) {
+        let options = [targetPerson]; // 先放入正確答案
+        
+        // 隨機抽取4個干擾項 (不能重複，也不能是正確答案)
+        let potentialDistractors = gameData.filter(p => p.name !== targetPerson.name);
+        
+        // 洗牌干擾項並取前4個
+        for (let i = potentialDistractors.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [potentialDistractors[i], potentialDistractors[j]] = [potentialDistractors[j], potentialDistractors[i]];
+        }
+        options = options.concat(potentialDistractors.slice(0, 4));
+        
+        // 最後將5個選項再次洗牌，以免答案總是在第一個
+        for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+        }
+        return options;
+    }
+
     function loadQuestion() {
         isAnswered = false;
         revealedClues = 1;
-        
-        // 更新 UI
-        document.getElementById('current-q').innerText = currentQIndex + 1;
-        document.getElementById('message').innerText = "";
-        document.getElementById('answer-input').value = "";
-        document.getElementById('answer-input').disabled = false;
-        document.getElementById('btn-submit').style.display = 'block';
-        document.getElementById('btn-hint').disabled = false;
-        document.getElementById('btn-next').style.display = 'none';
-        
-        // 渲染線索
-        const container = document.getElementById('clues-container');
-        container.innerHTML = '';
         const currentData = gameData[currentQIndex];
         
+        // 更新 UI 狀態
+        document.getElementById('current-q').innerText = currentQIndex + 1;
+        document.getElementById('message').innerText = "";
+        document.getElementById('message').className = "message";
+        document.getElementById('btn-hint').disabled = false;
+        document.getElementById('btn-hint').innerText = "🔍 顯示下一個線索 (-10分)";
+        document.getElementById('btn-next').style.display = 'none';
+        document.getElementById('btn-hint').style.display = 'inline-block';
+
+        // 1. 渲染線索
+        const cluesContainer = document.getElementById('clues-container');
+        cluesContainer.innerHTML = '';
         currentData.clues.forEach((clue, index) => {
             const div = document.createElement('div');
-            div.className = 'clue-box';
-            div.innerText = `線索 ${index + 1}: ${clue}`;
-            if (index === 0) div.classList.add('active'); // 預設顯示第一條
-            container.appendChild(div);
+            div.className = 'clue-card';
+            // 使用 emoji 增加趣味
+            const emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"];
+            div.innerText = `${emojis[index]} ${clue}`;
+            if (index === 0) div.classList.add('active'); 
+            cluesContainer.appendChild(div);
+        });
+
+        // 2. 準備並渲染 5 張答案卡片
+        currentOptions = prepareOptions(currentData);
+        const answersContainer = document.getElementById('answers-container');
+        answersContainer.innerHTML = ''; // 清空舊選項
+        
+        currentOptions.forEach(person => {
+            const button = document.createElement('button');
+            button.className = 'answer-card';
+            // 為了讓卡片看起來更豐富，可以顯示全名或簡稱，這裡用全名比較清楚
+            button.innerText = person.full; 
+            button.onclick = () => checkAnswer(person.name, button);
+            answersContainer.appendChild(button);
         });
     }
 
     function showNextClue() {
+        if (isAnswered) return; // 如果已回答就不能再看提示
         if (revealedClues < 5) {
-            const clues = document.querySelectorAll('.clue-box');
+            const clues = document.querySelectorAll('.clue-card');
             clues[revealedClues].classList.add('active');
             revealedClues++;
-            
-            // 滾動到底部
-            const container = document.getElementById('clues-container');
-            container.scrollTop = container.scrollHeight;
+             // 滾動到最新的線索 (手機版體驗較好)
+             clues[revealedClues-1].scrollIntoView({behavior: "smooth", block: "nearest"});
         }
         
         if (revealedClues === 5) {
@@ -195,65 +340,76 @@
         }
     }
 
-    function checkAnswer() {
-        const input = document.getElementById('answer-input').value.trim();
-        if (!input) return;
+    function checkAnswer(selectedName, clickedButton) {
+        if (isAnswered) return; // 防止重複點擊
+        isAnswered = true;
 
         const currentData = gameData[currentQIndex];
         const correctName = currentData.name;
         
-        // 模糊比對：只要輸入包含關鍵字就算對 (例如輸入 "使徒約翰" 對應 "約翰")
-        // 或輸入 "彼拉多" 對應 "本丟彼拉多"
-        if (input.includes(correctName) || correctName.includes(input)) {
-            // 計算得分：50 - (已開線索-1)*10
-            // 1個線索=50, 2個=40, 3個=30, 4個=20, 5個=10
+        const allAnswerButtons = document.querySelectorAll('.answer-card');
+        
+        if (selectedName === correctName) {
+            // 答對了
             const pointsEarned = 60 - (revealedClues * 10);
             score += pointsEarned;
-            
             document.getElementById('score').innerText = score;
-            document.getElementById('message').className = "message correct";
-            document.getElementById('message').innerText = `✅ 答對了！答案是「${currentData.full}」。獲得 ${pointsEarned} 分！`;
-            endTurn();
+            
+            document.getElementById('message').className = "message correct-msg";
+            document.getElementById('message').innerText = `🎉 答對了！加 ${pointsEarned} 分！`;
+            
+            clickedButton.classList.add('correct-answer');
         } else {
-            document.getElementById('message').className = "message wrong";
-            document.getElementById('message').innerText = "❌ 答案不對，再試試看，或者看下一個線索。";
+            // 答錯了
+            document.getElementById('message').className = "message wrong-msg";
+            document.getElementById('message').innerText = `😢 哎呀，答錯了。正確答案是「${currentData.full}」。`;
+            
+            clickedButton.classList.add('wrong-answer');
+            // 找出正確答案的按鈕並標示出來
+            allAnswerButtons.forEach(btn => {
+                if (btn.innerText === currentData.full) {
+                    btn.classList.add('correct-answer');
+                }
+            });
         }
-    }
 
-    function endTurn() {
-        isAnswered = true;
-        document.getElementById('answer-input').disabled = true;
-        document.getElementById('btn-submit').style.display = 'none';
-        document.getElementById('btn-hint').disabled = true;
+        // 鎖定所有答案卡片
+        allAnswerButtons.forEach(btn => btn.disabled = true);
+
+        // 顯示切換按鈕
+        document.getElementById('btn-hint').style.display = 'none';
         document.getElementById('btn-next').style.display = 'block';
 
         // 顯示所有未顯示的線索供學習
-        const clues = document.querySelectorAll('.clue-box');
+        const clues = document.querySelectorAll('.clue-card');
         clues.forEach(c => c.classList.add('active'));
     }
 
     function nextQuestion() {
         if (currentQIndex < gameData.length - 1) {
             currentQIndex++;
-            document.getElementById('btn-hint').innerText = "🔍 顯示下一個線索 (-10分)";
             loadQuestion();
+             // 滾動回頂部
+             document.querySelector('.game-container').scrollIntoView({behavior: "smooth", block: "start"});
         } else {
-            document.querySelector('.game-container').innerHTML = `
-                <h1>遊戲結束！</h1>
-                <p>你的總分是：</p>
-                <div style="font-size: 3rem; color: #e67e22; font-weight: bold;">${score}</div>
-                <p>感謝遊玩！</p>
-                <button onclick="location.reload()" class="btn-submit">再玩一次</button>
-            `;
+            showSummary();
         }
     }
+    
+    function showSummary() {
+        let comment = "";
+        if (score >= 800) comment = "太厲害了！你是聖經小博士！🏆";
+        else if (score >= 500) comment = "很棒喔！繼續加油！✨";
+        else comment = "不錯的嘗試！再玩一次會更進步！💪";
 
-    // 支援按 Enter 提交
-    document.getElementById('answer-input').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter' && !isAnswered) {
-            checkAnswer();
-        }
-    });
+        document.querySelector('.game-container').innerHTML = `
+            <h1>🎊 遊戲結束！ 🎊</h1>
+            <p style="font-size: 1.5rem; margin-top: 30px;">你的總得分是：</p>
+            <div style="font-size: 4rem; color: var(--accent-color); font-weight: bold; text-shadow: 3px 3px #ffe0b2;">${score}</div>
+            <p style="font-size: 1.3rem; color: var(--primary-color); margin-bottom: 40px;">${comment}</p>
+            <button onclick="location.reload()" class="btn-action btn-hint" style="font-size: 1.5rem; padding: 15px 40px;">🔄 再玩一次</button>
+        `;
+    }
 
     // 啟動
     initGame();
