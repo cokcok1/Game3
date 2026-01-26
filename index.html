@@ -1,289 +1,168 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聖經二選一 - 輕鬆學聖經</title>
+    <title>聖經之達人 - Bible Quiz</title>
     <style>
-        /* --- 基礎設定 (針對長者優化) --- */
+        :root {
+            --taiko-red: #ff4d4d;
+            --taiko-blue: #3d85c6;
+            --taiko-bg: #fdf5e6;
+        }
+
         body {
-            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
-            background-color: #f0f4f8; /* 柔和護眼背景 */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            text-align: center;
-        }
-
-        .game-container {
-            background: white;
-            width: 90%;
-            max-width: 600px; /* 手機平板都適用的寬度 */
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-
-        /* --- 頂部進度條 --- */
-        .header {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        /* --- 題目區域 --- */
-        .question-box {
-            font-size: 2rem; /* 超大字體 */
-            font-weight: bold;
-            color: #2d3748;
-            min-height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-            line-height: 1.4;
-        }
-
-        /* --- 按鈕區域 --- */
-        .options {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 20px 10px;
-            font-size: 2.5rem; /* 按鈕圖標很大 */
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: transform 0.1s;
+            font-family: "Microsoft JhengHei", sans-serif;
+            background-color: var(--taiko-bg);
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
         }
 
-        .btn span {
-            font-size: 1.2rem; /* 文字說明 */
-            margin-top: 5px;
+        #game-container {
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            border: 8px solid #555;
+            border-radius: 20px;
+            box-shadow: 0 10px 0 #ccc;
         }
 
-        .btn-true {
-            background-color: #48bb78; /* 綠色 */
-        }
-
-        .btn-false {
-            background-color: #f56565; /* 紅色 */
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        /* --- 結果解釋區 (預設隱藏) --- */
-        .feedback-area {
-            display: none; /* 初始隱藏 */
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #ebf8ff;
-            border-radius: 10px;
-            border-left: 5px solid #4299e1;
-            text-align: left;
-        }
-
-        .feedback-title {
-            font-size: 1.5rem;
+        .header {
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 10px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 4px dashed var(--taiko-red);
+            padding-bottom: 10px;
         }
 
-        .feedback-text {
-            font-size: 1.3rem;
-            color: #2d3748;
-            margin-bottom: 10px;
+        #question-box {
+            font-size: 22px;
+            min-height: 100px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
         }
 
-        .bible-ref {
-            font-size: 1rem;
-            color: #718096;
-            font-style: italic;
+        .btn-container {
+            display: flex;
+            justify-content: space-around;
         }
 
-        .next-btn {
-            margin-top: 20px;
-            background-color: #4299e1;
+        .circle-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 6px solid #333;
+            font-size: 40px;
+            font-weight: bold;
             color: white;
-            font-size: 1.5rem;
-            padding: 15px 40px;
-            border: none;
-            border-radius: 50px;
             cursor: pointer;
-            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+            user-select: none;
         }
 
-        /* --- 結束畫面 --- */
-        .end-screen {
-            display: none;
+        .btn-true { background-color: var(--taiko-red); box-shadow: 0 6px 0 #b33636; }
+        .btn-false { background-color: var(--taiko-blue); box-shadow: 0 6px 0 #2a5d8b; }
+
+        .circle-btn:active {
+            transform: scale(0.9);
+            box-shadow: 0 2px 0 #333;
         }
-        
-        /* 針對答錯時的樣式變化 */
-        .wrong-answer {
-            background-color: #fff5f5;
-            border-left-color: #f56565;
+
+        #score-board {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* 動畫效果 */
+        .correct-anim { color: var(--taiko-red); animation: bounce 0.5s; }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
         }
     </style>
 </head>
 <body>
 
-<div class="game-container">
+<div id="game-container">
+    <div class="header">🏮 聖經之達人 🏮</div>
+    <div id="question-box">載入中...</div>
     
-    <div id="game-screen">
-        <div class="header">題目 <span id="q-current">1</span> / <span id="q-total">3</span></div>
-        
-        <div class="question-box" id="question-text">
-            載入中...
-        </div>
-
-        <div class="options" id="options-area">
-            <button class="btn btn-true" onclick="checkAnswer(true)">
-                ⭕
-                <span>是 / 對</span>
-            </button>
-            <button class="btn btn-false" onclick="checkAnswer(false)">
-                ❌
-                <span>非 / 錯</span>
-            </button>
-        </div>
-
-        <div class="feedback-area" id="feedback-area">
-            <div class="feedback-title" id="feedback-title"></div>
-            <div class="feedback-text" id="feedback-text"></div>
-            <div class="bible-ref" id="bible-ref"></div>
-            <button class="next-btn" onclick="nextQuestion()">下一題 ➜</button>
-        </div>
+    <div class="btn-container">
+        <div class="circle-btn btn-true" onclick="checkAnswer(true)">⭕</div>
+        <div class="circle-btn btn-false" onclick="checkAnswer(false)">❌</div>
     </div>
 
-    <div id="end-screen" class="end-screen">
-        <h1>🎉 完成了！</h1>
-        <p style="font-size: 1.5rem;">感謝主，你今天學習了寶貴的真理。</p>
-        <p style="font-size: 1.2rem; color: #666;">你答對了 <span id="score"></span> 題</p>
-        <button class="next-btn" onclick="restartGame()">再玩一次</button>
-    </div>
-
+    <div id="score-board">分數: <span id="score">0</span> | 連擊: <span id="combo">0</span></div>
 </div>
 
 <script>
-    // --- 1. 題庫資料 (JSON 格式，方便你擴充) ---
     const questions = [
-        {
-            question: "耶穌是在耶路撒冷出生的嗎？",
-            answer: false, // 正確答案是 False
-            explanation: "耶穌降生在伯利恆的馬槽裡，因為當時約瑟和馬利亞要回鄉報名上冊。",
-            reference: "路加福音 2:4-7"
-        },
-        {
-            question: "神用七天創造天地，第七天休息？",
-            answer: true,
-            explanation: "是的，神在第七天歇了他一切的工，安息了。",
-            reference: "創世記 2:2"
-        },
-        {
-            question: "彼得原本的職業是稅吏？",
-            answer: false,
-            explanation: "彼得原本是漁夫。稅吏是馬太（利未）。",
-            reference: "馬太福音 4:18"
-        },
-        {
-            question: "舊約聖經一共有39卷書？",
-            answer: true,
-            explanation: "正確！舊約有39卷，新約有27卷，全書共66卷。",
-            reference: "聖經常識"
-        }
+        { q: "上帝用了 7 天時間創造世界，第 7 天祂休息了。", a: true },
+        { q: "挪亞方舟停在了西奈山上。", a: false }, // 應該是亞拉臘山
+        { q: "大衛用石頭打敗了巨人歌利亞。", a: true },
+        { q: "耶穌有 10 個門徒。", a: false }, // 應該是 12 個
+        { q: "摩西帶領以色列人走過紅海。", a: true },
+        { q: "《聖經》最後一卷書是《創世記》。", a: false } // 應該是《啟示錄》
     ];
 
-    // --- 2. 遊戲狀態變數 ---
-    let currentQuestionIndex = 0;
+    let currentIdx = 0;
     let score = 0;
+    let combo = 0;
 
-    // --- 3. 初始化遊戲 ---
-    function initGame() {
-        document.getElementById('q-total').innerText = questions.length;
-        loadQuestion();
-    }
+    const qBox = document.getElementById('question-box');
+    const scoreTxt = document.getElementById('score');
+    const comboTxt = document.getElementById('combo');
 
-    // 載入當前題目
     function loadQuestion() {
-        const q = questions[currentQuestionIndex];
-        document.getElementById('q-current').innerText = currentQuestionIndex + 1;
-        document.getElementById('question-text').innerText = q.question;
-        
-        // 重置介面狀態
-        document.getElementById('options-area').style.display = 'flex';
-        document.getElementById('feedback-area').style.display = 'none';
-        document.getElementById('feedback-area').className = 'feedback-area'; // 移除錯誤樣式
-    }
-
-    // --- 4. 檢查答案邏輯 ---
-    function checkAnswer(userChoice) {
-        const q = questions[currentQuestionIndex];
-        const isCorrect = (userChoice === q.answer);
-        
-        const feedbackArea = document.getElementById('feedback-area');
-        const feedbackTitle = document.getElementById('feedback-title');
-        const feedbackText = document.getElementById('feedback-text');
-        const bibleRef = document.getElementById('bible-ref');
-
-        // 隱藏選項，顯示結果
-        document.getElementById('options-area').style.display = 'none';
-        feedbackArea.style.display = 'block';
-
-        if (isCorrect) {
-            score++;
-            feedbackTitle.innerText = "✅ 答對了！";
-            feedbackTitle.style.color = "#276749"; // 深綠色
-            feedbackText.innerText = q.explanation;
+        if (currentIdx < questions.length) {
+            qBox.innerText = questions[currentIdx].q;
         } else {
-            feedbackArea.classList.add('wrong-answer');
-            feedbackTitle.innerText = "❌ 答錯了，其實...";
-            feedbackTitle.style.color = "#c53030"; // 深紅色
-            feedbackText.innerText = q.explanation;
-        }
-
-        bibleRef.innerText = "📖 " + q.reference;
-    }
-
-    // --- 5. 下一題或結束 ---
-    function nextQuestion() {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < questions.length) {
-            loadQuestion();
-        } else {
-            showEndScreen();
+            qBox.innerHTML = "🎉 恭喜完成！<br>最終得分: " + score;
+            document.querySelector('.btn-container').style.display = 'none';
         }
     }
 
-    function showEndScreen() {
-        document.getElementById('game-screen').style.display = 'none';
-        document.getElementById('end-screen').style.display = 'block';
-        document.getElementById('score').innerText = score + " / " + questions.length;
-    }
-
-    function restartGame() {
-        currentQuestionIndex = 0;
-        score = 0;
-        document.getElementById('game-screen').style.display = 'block';
-        document.getElementById('end-screen').style.display = 'none';
+    function checkAnswer(userAns) {
+        if (userAns === questions[currentIdx].a) {
+            score += 100 + (combo * 10);
+            combo++;
+            alertVisual("正確！✨");
+        } else {
+            combo = 0;
+            alertVisual("可惜！😢");
+        }
+        
+        currentIdx++;
+        updateDisplay();
         loadQuestion();
     }
 
-    // 啟動
-    initGame();
+    function updateDisplay() {
+        scoreTxt.innerText = score;
+        comboTxt.innerText = combo;
+    }
 
+    function alertVisual(text) {
+        // 簡單提示，實際開發可改用動畫
+        console.log(text);
+    }
+
+    loadQuestion();
 </script>
 
 </body>
