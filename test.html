@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>聖經麻雀</title>
+<style>
+  body { background: #fcefee; font-family: "Comic Sans MS", sans-serif; text-align:center; }
+  .board { display:flex; flex-wrap:wrap; justify-content:center; max-width:340px; margin:auto; }
+  .tile {
+    width:70px; height:80px; margin:4px; border-radius:12px;
+    box-shadow:0 3px 5px rgba(0,0,0,0.2); font-size:22px;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    cursor:pointer; transition: transform 0.1s;
+  }
+  .tile:active { transform:scale(0.95); }
+  .c-red{background:#ffb3b3;}
+  .c-blue{background:#b3e6ff;}
+  .c-green{background:#b3ffb3;}
+  .c-gray{background:#eee;}
+</style>
+</head>
+<body>
+  <h2>🌈 聖經麻雀 Shanghai Mahjong</h2>
+  <div class="board" id="board"></div>
+
+<script>
+const tiles = [
+ {t:"摩西", i:"🌊", s:"萬", c:"c-red"}, {t:"大衛", i:"👑", s:"萬", c:"c-red"},
+ {t:"保羅", i:"📜", s:"萬", c:"c-red"}, {t:"彼得", i:"🐟", s:"萬", c:"c-red"},
+ {t:"約拿", i:"🐋", s:"萬", c:"c-red"}, {t:"馬利亞", i:"🤰", s:"萬", c:"c-red"},
+ {t:"亞伯蘭", i:"🐑", s:"萬", c:"c-red"}, {t:"但以理", i:"🦁", s:"萬", c:"c-red"},
+ {t:"教會", i:"⛪", s:"筒", c:"c-blue"}, {t:"西奈", i:"⛰️", s:"筒", c:"c-blue"},
+ {t:"紅海", i:"🌊", s:"筒", c:"c-blue"}, {t:"伊甸", i:"🍎", s:"筒", c:"c-blue"},
+ {t:"加利利", i:"🛶", s:"筒", c:"c-blue"}, {t:"聖殿", i:"🏛️", s:"筒", c:"c-blue"},
+ {t:"耶利哥", i:"🧱", s:"筒", c:"c-blue"}, {t:"方舟", i:"🚢", s:"筒", c:"c-blue"},
+ {t:"十架", i:"✝️", s:"索", c:"c-green"}, {t:"聖經", i:"📖", s:"索", c:"c-green"},
+ {t:"五餅", i:"🍞", s:"索", c:"c-green"}, {t:"二魚", i:"🐟", c:"索", c:"c-green"},
+ {t:"寶血", i:"🍷", s:"索", c:"c-green"}, {t:"聖靈", i:"🕊️", s:"索", c:"c-green"},
+ {t:"信", i:"🛡️", s:"番", c:"c-gray"}, {t:"望", i:"⚓", s:"番", c:"c-gray"},
+ {t:"愛", i:"❤️", s:"番", c:"c-gray"}, {t:"阿們", i:"🙏", s:"番", c:"c-gray"},
+ {t:"禱告", i:"🤲", s:"番", c:"c-gray"}, {t:"復活", i:"🌅", s:"番", c:"c-gray"},
+ {t:"挪亞", i:"🌈", s:"萬", c:"c-red"}, {t:"約書亞", i:"🎺", s:"萬", c:"c-red"},
+ {t:"以利亞", i:"🔥", s:"萬", c:"c-red"},
+ {t:"葡萄", i:"🍇", s:"索", c:"c-green"}, {t:"磐石", i:"🪨", s:"索", c:"c-green"},
+ {t:"亮光", i:"💡", s:"筒", c:"c-blue"}, {t:"天國", i:"☁️", s:"筒", c:"c-blue"},
+ {t:"喜樂", i:"😄", s:"番", c:"c-gray"}
+];
+const board = document.getElementById('board');
+tiles.forEach(x=>{
+  const d = document.createElement('div');
+  d.className = `tile ${x.c}`;
+  d.innerHTML = `${x.i}<br><small>${x.t}</small>`;
+  board.appendChild(d);
+});
+</script>
+</body>
+</html>
