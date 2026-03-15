@@ -2,265 +2,224 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聖經之達人 - Bible Master Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>繽紛數字大挑戰</title>
     <style>
         :root {
-            --taiko-red: #ff4747;
-            --taiko-blue: #47a0ff;
-            --bg-cream: #fdf5e6;
-            --border-brown: #5d4037;
+            --bg-color: #FFF9E3; /* 鵝黃粉 */
+            --header-bg: #FFD1DC; /* 粉紅 */
+            --text-color: #5D5D5D;
+            --yes-color: #A2D9A1; /* 粉綠 */
+            --no-color: #FF9AA2;  /* 粉紅 */
+            --shadow: #C4A484;
         }
 
         body {
-            font-family: "Microsoft JhengHei", "Noto Sans JP", sans-serif;
-            background-color: var(--bg-cream);
             margin: 0;
+            padding: 0;
+            font-family: "Comic Sans MS", "Chalkboard SE", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
-            align-items: center;
             height: 100vh;
             overflow: hidden;
+            user-select: none;
         }
 
-        /* 頂部計分欄 */
-        .top-status {
-            width: 100%;
-            height: 60px;
-            background: rgba(255,255,255,0.9);
-            border-bottom: 4px solid var(--border-brown);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            box-sizing: border-box;
-            font-weight: bold;
-            z-index: 10;
-        }
-
-        /* 遊戲主標題 */
-        .game-title {
-            font-size: 40px;
-            color: var(--border-brown);
-            margin: 20px 0;
-            text-shadow: 2px 2px 0px white;
-            font-weight: 900;
-        }
-
-        /* 題目顯示區 */
-        #game-screen {
-            display: none; /* 載入檔案前隱藏 */
-            width: 90%;
-            max-width: 700px;
-            text-align: center;
-        }
-
-        .question-banner {
-            background: white;
-            border: 6px solid var(--border-brown);
-            border-radius: 50px;
-            padding: 40px 20px;
-            font-size: 24px;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 0px #d7ccc8;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* 太鼓按鈕區域 */
-        .drum-container {
+        /* 頂部資訊列 */
+        #header {
+            background-color: var(--header-bg);
+            padding: 15px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            margin-top: 20px;
+            border-bottom: 5px solid #FFB6C1;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 1.2rem;
+            color: #555;
+            font-weight: bold;
         }
 
-        .drum {
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            border: 8px solid var(--border-brown);
-            font-size: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.1s;
-            user-select: none;
-            color: white;
-            position: relative;
-        }
-
-        .drum-o { background-color: var(--taiko-red); box-shadow: 0 10px 0 #b23131; }
-        .drum-x { background-color: var(--taiko-blue); box-shadow: 0 10px 0 #316eb2; }
-
-        .drum:active {
-            transform: translateY(8px);
-            box-shadow: 0 2px 0 var(--border-brown);
-        }
-
-        /* 下方裝飾角色區 */
-        .character-area {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 150px;
-            display: flex;
-            justify-content: center;
-            pointer-events: none;
-        }
-
-        .char-img {
-            height: 120px; /* 這裡預留放圖片的位置 */
-            background: #eee;
-            border-radius: 50% 50% 0 0;
-            padding: 10px 40px;
-            border: 4px solid var(--border-brown);
-        }
-
-        /* 上傳初始畫面 */
-        #upload-screen {
-            margin-top: 100px;
-            text-align: center;
-            padding: 40px;
-            border: 4px dashed var(--border-brown);
+        .stat-box {
+            background: rgba(255,255,255,0.5);
+            padding: 5px 15px;
             border-radius: 20px;
         }
 
-        .combo-text {
-            color: #ff9800;
-            font-size: 30px;
-            animation: bounce 0.3s ease;
+        /* 題目顯示區 */
+        #question-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.3); }
+        #q-card {
+            background: white;
+            width: 85%;
+            height: 60%;
+            border-radius: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 100px;
+            font-weight: 900;
+            color: var(--text-color);
+            box-shadow: 0 15px 0px #E0E0E0;
+            border: 8px solid #FFD1DC;
+        }
+
+        /* 按鈕區 */
+        #button-area {
+            height: 35%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 20px 20px 20px;
+        }
+
+        /* 實體感按鈕設計 */
+        .real-button {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            font-size: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.1s;
+            border: none;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        #btn-yes {
+            background-color: var(--yes-color);
+            box-shadow: 0 12px 0px #86B985, 0 15px 20px rgba(0,0,0,0.2);
+        }
+        #btn-yes:active {
+            transform: translateY(8px);
+            box-shadow: 0 4px 0px #86B985;
+        }
+
+        #btn-no {
+            background-color: var(--no-color);
+            box-shadow: 0 12px 0px #D67A81, 0 15px 20px rgba(0,0,0,0.2);
+        }
+        #btn-no:active {
+            transform: translateY(8px);
+            box-shadow: 0 4px 0px #D67A81;
+        }
+
+        /* 答題回饋遮罩 */
+        #flash {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none;
+            pointer-events: none;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
 
-    <div class="top-status">
-        <div>SCORE: <span id="score">000000</span></div>
-        <div id="combo-container">COMBO: x<span id="combo">0</span></div>
+    <div id="header">
+        <div class="stat-box">第 <span id="count">1</span> / 100 題</div>
+        <div class="stat-box">分數: <span id="score">0</span></div>
+    </div>
+    
+    <div id="question-container">
+        <div id="q-card">1 + 1 = 2</div>
     </div>
 
-    <div class="game-title">聖經の達人</div>
-
-    <div id="upload-screen">
-        <h2>歡迎！請上傳題目檔案</h2>
-        <input type="file" id="fileInput" accept=".txt">
-        <p style="color: #666; margin-top: 10px;">格式：題目|1 (對) 或 題目|0 (錯)</p>
+    <div id="button-area">
+        <button id="btn-no" class="real-button" onclick="checkAnswer(false)">×</button>
+        <button id="btn-yes" class="real-button" onclick="checkAnswer(true)">○</button>
     </div>
 
-    <div id="game-screen">
-        <div class="question-banner" id="question-text">
-            準備好了嗎？
-        </div>
-
-        <div class="drum-container">
-            <div class="drum drum-o" onclick="handleAnswer(true)">⭕</div>
-            <div class="drum drum-x" onclick="handleAnswer(false)">❌</div>
-        </div>
-    </div>
-
-    <div class="character-area">
-        <div class="char-img">🥁 玩家角色位置</div>
-    </div>
+    <div id="flash"></div>
 
     <script>
-        let allQuestions = [];
-        let currentIndex = 0;
+        let currentIdx = 1;
+        let total = 100;
         let score = 0;
-        let combo = 0;
+        let correctFlag = true;
+        const synth = window.speechSynthesis;
 
-        const fileInput = document.getElementById('fileInput');
-        const uploadScreen = document.getElementById('upload-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const questionText = document.getElementById('question-text');
-        const scoreDisplay = document.getElementById('score');
-        const comboDisplay = document.getElementById('combo');
-
-        // 讀取檔案
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const lines = e.target.result.split('\n');
-                allQuestions = lines.map(line => {
-                    const parts = line.split('|');
-                    if (parts.length === 2) {
-                        return { q: parts[0].trim(), a: parts[1].trim() === '1' };
-                    }
-                    return null;
-                }).filter(item => item !== null);
-
-                if (allQuestions.length > 0) {
-                    startGame();
-                } else {
-                    alert("檔案格式不正確，請檢查！");
-                }
-            };
-            reader.readAsText(file);
-        });
-
-        function startGame() {
-            // 洗牌 100 題
-            allQuestions.sort(() => Math.random() - 0.5);
-            currentIndex = 0;
-            score = 0;
-            combo = 0;
-            
-            uploadScreen.style.display = 'none';
-            gameScreen.style.display = 'block';
-            showNextQuestion();
+        function speak(text) {
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'zh-HK';
+            utter.rate = 0.9; // 稍微慢一點點方便聽清楚
+            synth.speak(utter);
         }
 
-        function showNextQuestion() {
-            if (currentIndex < allQuestions.length) {
-                questionText.innerText = allQuestions[currentIndex].q;
-            } else {
-                questionText.innerText = "🎊 挑戰完成！總分：" + score;
-                document.querySelector('.drum-container').style.display = 'none';
+        function getNewQuestion() {
+            if (currentIdx > total) {
+                document.getElementById('q-card').style.fontSize = "40px";
+                document.getElementById('q-card').innerHTML = "完成練習！<br>總分: " + score;
+                speak("練習完成，你好叻呀！");
+                return;
             }
+
+            // 更新介面數字
+            document.getElementById('count').innerText = currentIdx;
+            document.getElementById('score').innerText = score;
+
+            // 隨機生成 1:加法 2:減法 3:大小
+            const mode = Math.floor(Math.random() * 3);
+            let a, b, displayVal, text;
+
+            if (mode === 0) { // 加法
+                a = Math.floor(Math.random() * 10) + 1;
+                b = Math.floor(Math.random() * 10) + 1;
+                correctFlag = Math.random() > 0.5;
+                displayVal = correctFlag ? (a + b) : (a + b + (Math.random() > 0.5 ? 1 : -1));
+                document.getElementById('q-card').innerText = `${a} + ${b} = ${displayVal}`;
+                text = `${a} 加 ${b} 係咪等於 ${displayVal}？`;
+            } else if (mode === 1) { // 減法
+                a = Math.floor(Math.random() * 10) + 10;
+                b = Math.floor(Math.random() * 9) + 1;
+                correctFlag = Math.random() > 0.5;
+                displayVal = correctFlag ? (a - b) : (a - b + (Math.random() > 0.5 ? 1 : -1));
+                document.getElementById('q-card').innerText = `${a} - ${b} = ${displayVal}`;
+                text = `${a} 減 ${b} 係咪等於 ${displayVal}？`;
+            } else { // 大小比較
+                a = Math.floor(Math.random() * 50);
+                b = Math.floor(Math.random() * 50);
+                if (a === b) { getNewQuestion(); return; }
+                const isGreater = Math.random() > 0.5;
+                document.getElementById('q-card').innerText = isGreater ? `${a} > ${b}` : `${a} < ${b}`;
+                correctFlag = isGreater ? (a > b) : (a < b);
+                text = `${a} 係咪比 ${b} 大？`;
+            }
+            
+            speak(text);
         }
 
-        function handleAnswer(userChoice) {
-            const correctAnswer = allQuestions[currentIndex].a;
-
-            if (userChoice === correctAnswer) {
-                combo++;
-                score += 100 + (combo * 10);
-                // 簡單的反饋效果
-                questionText.style.borderColor = "#4caf50";
+        function checkAnswer(userChoice) {
+            const flash = document.getElementById('flash');
+            if (userChoice === correctFlag) {
+                score++;
+                flash.style.backgroundColor = "rgba(162, 217, 161, 0.4)";
             } else {
-                combo = 0;
-                questionText.style.borderColor = "#f44336";
+                flash.style.backgroundColor = "rgba(255, 154, 162, 0.4)";
             }
 
-            updateDisplay();
-            currentIndex++;
-            
+            flash.style.display = 'block';
             setTimeout(() => {
-                questionText.style.borderColor = "var(--border-brown)";
-                showNextQuestion();
-            }, 300);
+                flash.style.display = 'none';
+                currentIdx++;
+                getNewQuestion();
+            }, 400);
         }
 
-        function updateDisplay() {
-            scoreDisplay.innerText = String(score).padStart(6, '0');
-            comboDisplay.innerText = combo;
-            if (combo > 0) {
-                comboDisplay.parentElement.classList.add('combo-text');
-            } else {
-                comboDisplay.parentElement.classList.remove('combo-text');
-            }
-        }
+        window.onload = () => {
+            setTimeout(getNewQuestion, 800);
+        };
     </script>
 </body>
 </html>
