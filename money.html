@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>加拿大金錢大挑戰</title>
+    <style>
+        :root {
+            --bg-color: #E3F2FD; /* 粉藍色底 */
+            --header-bg: #FFD1DC;
+            --text-color: #444;
+            --yes-color: #A2D9A1;
+            --no-color: #FF9AA2;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: sans-serif;
+            background-color: var(--bg-color);
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden; user-select: none;
+        }
+
+        #header {
+            background-color: var(--header-bg);
+            padding: 15px; display: flex; justify-content: space-around;
+            font-weight: bold; border-bottom: 5px solid #FFB6C1;
+        }
+
+        #question-container {
+            flex: 1; display: flex; justify-content: center; align-items: center; padding: 10px;
+        }
+
+        #q-card {
+            background: white; width: 90%; max-width: 400px; height: 65%;
+            border-radius: 40px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            box-shadow: 0 12px 0px #BDC3C7; border: 8px solid #FFD1DC;
+        }
+
+        .coin-img {
+            width: 180px; height: 180px; object-fit: contain; margin-bottom: 20px;
+        }
+
+        .money-text {
+            font-size: 80px; font-weight: 900; color: #2E86C1;
+        }
+
+        #button-area {
+            height: 30%; display: flex; justify-content: space-around;
+            padding: 10px 20px 80px 20px;
+        }
+
+        .real-button {
+            width: 130px; height: 130px; border-radius: 50%;
+            font-size: 70px; display: flex; justify-content: center; align-items: center;
+            border: none; color: white; font-weight: bold;
+            transition: all 0.1s; -webkit-tap-highlight-color: transparent;
+        }
+
+        #btn-yes { background-color: var(--yes-color); box-shadow: 0 12px 0px #86B985; }
+        #btn-yes:active { transform: translateY(8px); box-shadow: 0 4px 0px #86B985; }
+
+        #btn-no { background-color: var(--no-color); box-shadow: 0 12px 0px #D67A81; }
+        #btn-no:active { transform: translateY(8px); box-shadow: 0 4px 0px #D67A81; }
+
+        #flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 100; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <div style="background:white; padding:5px 15px; border-radius:20px;">題數: <span id="count">1</span>/100</div>
+        <div style="background:white; padding:5px 15px; border-radius:20px;">得分: <span id="score">0</span></div>
+    </div>
+    
+    <div id="question-container">
+        <div id="q-card">
+            <img id="coin-pic" class="coin-img" src="" alt="coin">
+            <div id="coin-val" class="money-text"></div>
+        </div>
+    </div>
+
+    <div id="button-area">
+        <button id="btn-no" class="real-button" onclick="checkAnswer(false)">×</button>
+        <button id="btn-yes" class="real-button" onclick="checkAnswer(true)">○</button>
+    </div>
+
+    <div id="flash"></div>
+
+    <script>
+        // 加拿大硬幣數據
+        const coins = [
+            { name: "5 毫", value: 5, img: "https://upload.wikimedia.org/wikipedia/en/thumb/7/7e/Canadian_Nickel_-_obverse.png/220px-Canadian_Nickel_-_obverse.png" },
+            { name: "10 毫", value: 10, img: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Canadian_Dime_-_obverse.png/220px-Canadian_Dime_-_obverse.png" },
+            { name: "25 毫", value: 25, img: "https://upload.wikimedia.org/wikipedia/en/thumb/7/70/Canadian_Quarter_-_obverse.png/220px-Canadian_Quarter_-_obverse.png" },
+            { name: "1 蚊", value: 1, img: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d7/Canadian_Loonie_-_obverse.png/220px-Canadian_Loonie_-_obverse.png" },
+            { name: "2 蚊", value: 2, img: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/Canadian_Toonie_-_obverse.png/220px-Canadian_Toonie_-_obverse.png" }
+        ];
+
+        let currentIdx = 1, score = 0, correctFlag = true;
+        const synth = window.speechSynthesis;
+
+        function speak(text) {
+            synth.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'zh-HK';
+            utter.rate = 0.85;
+            synth.speak(utter);
+        }
+
+        function getNewQuestion() {
+            if (currentIdx > 100) {
+                document.getElementById('q-card').innerHTML = "<div style='font-size:40px'>好叻呀！做完喇！</div>";
+                speak("練習完成，你好叻呀！");
+                return;
+            }
+
+            document.getElementById('count').innerText = currentIdx;
+            document.getElementById('score').innerText = score;
+
+            // 隨機選一粒硬幣
+            const coin = coins[Math.floor(Math.random() * coins.length)];
+            correctFlag = Math.random() > 0.5;
+            
+            // 如果要出錯題，就隨機選一個錯誤的數值
+            let displayVal;
+            if (correctFlag) {
+                displayVal = coin.value;
+            } else {
+                let wrongCoin = coins[Math.floor(Math.random() * coins.length)];
+                while(wrongCoin.value === coin.value) {
+                    wrongCoin = coins[Math.floor(Math.random() * coins.length)];
+                }
+                displayVal = wrongCoin.value;
+            }
+
+            document.getElementById('coin-pic').src = coin.img;
+            document.getElementById('coin-val').innerText = displayVal;
+
+            let unit = (coin.value >= 1 && coin.value <= 2) ? "蚊" : "毫";
+            speak(`呢個係咪 ${displayVal} ${unit}？`);
+        }
+
+        function checkAnswer(userChoice) {
+            const flash = document.getElementById('flash');
+            if (userChoice === correctFlag) {
+                score++;
+                flash.style.backgroundColor = "rgba(162, 217, 161, 0.4)";
+            } else {
+                flash.style.backgroundColor = "rgba(255, 154, 162, 0.4)";
+            }
+            flash.style.display = 'block';
+            setTimeout(() => {
+                flash.style.display = 'none';
+                currentIdx++;
+                getNewQuestion();
+            }, 500);
+        }
+
+        window.onload = () => setTimeout(getNewQuestion, 500);
+    </script>
+</body>
+</html>
