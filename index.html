@@ -3,165 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>繽紛數字大挑戰</title>
+    <title>ABC 數字挑戰</title>
     <style>
         :root {
-            --bg-color: #FFF9E3; /* 鵝黃粉 */
-            --header-bg: #FFD1DC; /* 粉紅 */
+            --bg-color: #FFF0F5; /* 淺粉紅底 */
+            --header-bg: #FFD1DC;
             --text-color: #5D5D5D;
-            --yes-color: #A2D9A1; /* 粉綠 */
-            --no-color: #FF9AA2;  /* 粉紅 */
+            --btn-a: #FFB7B2; /* 粉紅 */
+            --btn-b: #B2E2F2; /* 粉藍 */
+            --btn-c: #FDFD96; /* 粉黃 */
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: "Comic Sans MS", "Chalkboard SE", "Microsoft JhengHei", sans-serif;
+            margin: 0; padding: 0;
+            font-family: "Arial Rounded MT Bold", sans-serif;
             background-color: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-            user-select: none;
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden; user-select: none;
         }
 
-        /* 頂部資訊列 */
         #header {
             background-color: var(--header-bg);
-            padding: 15px 10px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-bottom: 5px solid #FFB6C1;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            font-size: 1.1rem;
-            color: #555;
-            font-weight: bold;
-            z-index: 10;
+            padding: 15px; display: flex; justify-content: space-around;
+            font-weight: bold; border-bottom: 5px solid #FFB6C1;
+            font-size: 1.2rem; color: #666;
         }
 
-        .stat-box {
-            background: rgba(255,255,255,0.6);
-            padding: 8px 15px;
-            border-radius: 20px;
-        }
-
-        /* 題目顯示區 - 稍微縮小高度騰出空間 */
         #question-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            flex: 1; display: flex; justify-content: center; align-items: center;
         }
 
         #q-card {
-            background: white;
-            width: 100%;
-            max-width: 500px;
-            height: 70%;
-            border-radius: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 80px;
-            font-weight: 900;
+            background: white; width: 85%; height: 50%;
+            border-radius: 40px; display: flex;
+            justify-content: center; align-items: center;
+            font-size: 80px; font-weight: 900;
             color: var(--text-color);
             box-shadow: 0 12px 0px #E0E0E0;
             border: 8px solid #FFD1DC;
         }
 
-        /* 按鈕區 - 增加底部邊距避免遮擋 */
+        /* ABC 按鈕區 */
         #button-area {
-            height: 30%;
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-start; /* 改為靠上對齊 */
-            padding: 20px 20px 80px 20px; /* 增加底部 padding (80px) 避開 Menu Bar */
+            height: 35%;
+            display: flex; justify-content: space-around;
+            align-items: center;
+            padding: 0 10px 80px 10px; /* 避開底部 Menu Bar */
         }
 
-        .real-button {
-            width: 130px;
-            height: 130px;
+        .choice-btn {
+            width: 100px; height: 100px;
             border-radius: 50%;
-            font-size: 70px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
+            font-size: 36px; font-weight: bold;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            border: none; color: #444;
+            cursor: pointer; transition: all 0.1s;
             position: relative;
-            transition: all 0.1s;
-            border: none;
-            color: white;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
             -webkit-tap-highlight-color: transparent;
         }
 
-        #btn-yes {
-            background-color: var(--yes-color);
-            box-shadow: 0 12px 0px #86B985, 0 10px 20px rgba(0,0,0,0.15);
-        }
-        #btn-yes:active {
-            transform: translateY(8px);
-            box-shadow: 0 4px 0px #86B985;
-        }
+        .btn-label { font-size: 18px; margin-bottom: 2px; color: #777; }
+        .btn-val { font-size: 40px; font-weight: 900; }
 
-        #btn-no {
-            background-color: var(--no-color);
-            box-shadow: 0 12px 0px #D67A81, 0 10px 20px rgba(0,0,0,0.15);
-        }
-        #btn-no:active {
-            transform: translateY(8px);
-            box-shadow: 0 4px 0px #D67A81;
-        }
+        #btn-0 { background-color: var(--btn-a); box-shadow: 0 10px 0px #D69A96; }
+        #btn-1 { background-color: var(--btn-b); box-shadow: 0 10px 0px #8AB6C4; }
+        #btn-2 { background-color: var(--btn-c); box-shadow: 0 10px 0px #D1D17A; }
 
-        #flash {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: none;
-            pointer-events: none;
-            z-index: 100;
-        }
+        .choice-btn:active { transform: translateY(6px); box-shadow: 0 4px 0px #AAA; }
+
+        #flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 100; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <div id="header">
-        <div class="stat-box">題數: <span id="count">1</span> / 100</div>
-        <div class="stat-box">得分: <span id="score">0</span></div>
+        <div style="background:white; padding:5px 15px; border-radius:20px;">題: <span id="count">1</span>/100</div>
+        <div style="background:white; padding:5px 15px; border-radius:20px;">分: <span id="score">0</span></div>
     </div>
     
     <div id="question-container">
-        <div id="q-card">-</div>
+        <div id="q-card">15 + 2</div>
     </div>
 
     <div id="button-area">
-        <button id="btn-no" class="real-button" onclick="checkAnswer(false)">×</button>
-        <button id="btn-yes" class="real-button" onclick="checkAnswer(true)">○</button>
+        <button id="btn-0" class="choice-btn" onclick="checkAnswer(0)">
+            <span class="btn-label">A</span>
+            <span id="val-0" class="btn-val">?</span>
+        </button>
+        <button id="btn-1" class="choice-btn" onclick="checkAnswer(1)">
+            <span class="btn-label">B</span>
+            <span id="val-1" class="btn-val">?</span>
+        </button>
+        <button id="btn-2" class="choice-btn" onclick="checkAnswer(2)">
+            <span class="btn-label">C</span>
+            <span id="val-2" class="btn-val">?</span>
+        </button>
     </div>
 
     <div id="flash"></div>
 
     <script>
-        let currentIdx = 1;
-        let total = 100;
-        let score = 0;
-        let correctFlag = true;
+        let currentIdx = 1, score = 0;
+        let correctAnswerIdx = 0;
         const synth = window.speechSynthesis;
 
         function speak(text) {
-            synth.cancel(); // 先停止之前的說話
+            synth.cancel();
             const utter = new SpeechSynthesisUtterance(text);
             utter.lang = 'zh-HK';
             utter.rate = 0.9;
             synth.speak(utter);
         }
 
-        function getNewQuestion() {
-            if (currentIdx > total) {
-                document.getElementById('q-card').style.fontSize = "40px";
-                document.getElementById('q-card').innerHTML = "完成練習！<br>得分: " + score;
+        function generateOptions(correctVal) {
+            let opts = [correctVal];
+            while(opts.length < 3) {
+                let offset = Math.floor(Math.random() * 5) + 1;
+                let wrongVal = Math.random() > 0.5 ? correctVal + offset : correctVal - offset;
+                if(wrongVal >= 0 && !opts.includes(wrongVal)) opts.push(wrongVal);
+            }
+            // 隨機打亂順序
+            opts.sort(() => Math.random() - 0.5);
+            return opts;
+        }
+
+        function nextQuestion() {
+            if (currentIdx > 100) {
+                document.getElementById('q-card').innerText = "完咗喇！";
                 speak("練習完成，你好叻呀！");
                 return;
             }
@@ -169,56 +138,43 @@
             document.getElementById('count').innerText = currentIdx;
             document.getElementById('score').innerText = score;
 
-            const mode = Math.floor(Math.random() * 3);
-            let a, b, displayVal, text;
+            // 隨機題目：兩位數 (10-20) 加/減 一位數 (1-9)
+            const a = Math.floor(Math.random() * 11) + 10; // 10-20
+            const b = Math.floor(Math.random() * 9) + 1;   // 1-9
+            const isPlus = Math.random() > 0.5;
+            const correctVal = isPlus ? (a + b) : (a - b);
+            const opStr = isPlus ? "+" : "-";
 
-            if (mode === 0) {
-                a = Math.floor(Math.random() * 10) + 1;
-                b = Math.floor(Math.random() * 10) + 1;
-                correctFlag = Math.random() > 0.5;
-                displayVal = correctFlag ? (a + b) : (a + b + (Math.random() > 0.5 ? 2 : -1));
-                document.getElementById('q-card').innerText = `${a} + ${b} = ${displayVal}`;
-                text = `${a} 加 ${b} 等於 ${displayVal}，啱唔啱？`;
-            } else if (mode === 1) {
-                a = Math.floor(Math.random() * 10) + 6;
-                b = Math.floor(Math.random() * 5) + 1;
-                correctFlag = Math.random() > 0.5;
-                displayVal = correctFlag ? (a - b) : (a - b + (Math.random() > 0.5 ? 1 : -1));
-                document.getElementById('q-card').innerText = `${a} - ${b} = ${displayVal}`;
-                text = `${a} 減 ${b} 等於 ${displayVal}，啱唔啱？`;
-            } else {
-                a = Math.floor(Math.random() * 50);
-                b = Math.floor(Math.random() * 50);
-                if (a === b) { getNewQuestion(); return; }
-                const isGreater = Math.random() > 0.5;
-                document.getElementById('q-card').innerText = isGreater ? `${a} > ${b}` : `${a} < ${b}`;
-                correctFlag = isGreater ? (a > b) : (a < b);
-                text = isGreater ? `${a} 大過 ${b}，啱唔啱？` : `${a} 細過 ${b}，啱唔啱？`;
+            document.getElementById('q-card').innerText = `${a} ${opStr} ${b}`;
+            speak(`${a} ${isPlus ? '加' : '減'} ${b} 等於幾多？`);
+
+            // 生成選項
+            const options = generateOptions(correctVal);
+            correctAnswerIdx = options.indexOf(correctVal);
+
+            for(let i=0; i<3; i++) {
+                document.getElementById(`val-${i}`).innerText = options[i];
             }
-            
-            speak(text);
         }
 
-        function checkAnswer(userChoice) {
+        function checkAnswer(idx) {
             const flash = document.getElementById('flash');
-            if (userChoice === correctFlag) {
+            if (idx === correctAnswerIdx) {
                 score++;
-                flash.style.backgroundColor = "rgba(162, 217, 161, 0.4)";
+                flash.style.backgroundColor = "rgba(162, 217, 161, 0.4)"; // 綠色回饋
             } else {
-                flash.style.backgroundColor = "rgba(255, 154, 162, 0.4)";
+                flash.style.backgroundColor = "rgba(255, 154, 162, 0.4)"; // 紅色回饋
             }
-
+            
             flash.style.display = 'block';
             setTimeout(() => {
                 flash.style.display = 'none';
                 currentIdx++;
-                getNewQuestion();
-            }, 400);
+                nextQuestion();
+            }, 500);
         }
 
-        window.onload = () => {
-            setTimeout(getNewQuestion, 800);
-        };
+        window.onload = () => setTimeout(nextQuestion, 500);
     </script>
 </body>
 </html>
