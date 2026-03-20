@@ -94,8 +94,7 @@
 <body>
 
     <div id="header">
-        <div class="stat-box">題數: <span id="count">0</span>/50</div>
-        <div class="stat-box">總分: <span id="score">0</span></div>
+        <div class="stat-box">答啱題數: <span id="correct-count">0</span>/50</div>
     </div>
     
     <div id="question-container">
@@ -108,7 +107,7 @@
         <button id="btn-2" class="choice-btn" onclick="checkAnswer(2)"><span id="val-2" class="btn-val">?</span></button>
     </div>
 
-    <div id="version-tag">v1.6.1 (Junior 2-Digit Edition)</div>
+    <div id="version-tag">v1.7.0 (Accuracy Challenge)</div>
 
     <div id="hint-overlay">
         <div style="font-size: 100px;">🌟</div>
@@ -124,14 +123,13 @@
     <div id="flash"></div>
 
     <script>
-        let currentIdx = parseInt(localStorage.getItem('kenneth_idx')) || 1;
-        let score = parseInt(localStorage.getItem('kenneth_score')) || 0;
+        // 這裡的 correct-count 同時代表進度和分數
+        let correctCount = parseInt(localStorage.getItem('ryan_correct_count')) || 0;
         let correctAnswerIdx = 0;
         const synth = window.speechSynthesis;
 
         function saveProgress() {
-            localStorage.setItem('kenneth_idx', currentIdx);
-            localStorage.setItem('kenneth_score', score);
+            localStorage.setItem('ryan_correct_count', correctCount);
         }
 
         function speakEnglish(text) {
@@ -168,16 +166,18 @@
             hintBox.style.display = 'block';
             speakCantonese(`好叻呀！仲有 ${remain} 題就有免費咖啡飲喇！`);
             
+            // 按照要求設置為 8 秒 (8000 毫秒)
             setTimeout(() => {
                 hintBox.style.display = 'none';
                 generateNext();
-            }, 10000);
+            }, 8000);
         }
 
-        function nextQuestionLogic() {
-            if ((currentIdx - 1) % 10 === 0 && currentIdx > 1 && currentIdx < 50) {
-                showHint(50 - (currentIdx - 1));
-            } else if (currentIdx > 50) {
+        function checkProgress() {
+            // 只有在剛好答對 10, 20, 30, 40 題時才提示
+            if (correctCount > 0 && correctCount < 50 && correctCount % 10 === 0) {
+                showHint(50 - correctCount);
+            } else if (correctCount >= 50) {
                 document.getElementById('reward-overlay').style.display = 'flex';
                 speakCantonese("Kenneth 請 Ryan 飲咖啡！恭喜晒！");
             } else {
@@ -186,10 +186,9 @@
         }
 
         function generateNext() {
-            document.getElementById('count').innerText = currentIdx;
-            document.getElementById('score').innerText = score;
+            document.getElementById('correct-count').innerText = correctCount;
 
-            // 調整難度：範圍限定在 10 到 20 之間
+            // 範圍 10 到 20
             const a = Math.floor(Math.random() * 11) + 10; 
             const b = Math.floor(Math.random() * 11) + 10; 
             const isPlus = Math.random() > 0.5;
@@ -216,30 +215,36 @@
         function checkAnswer(idx) {
             const flash = document.getElementById('flash');
             if (idx === correctAnswerIdx) {
-                score++;
-                flash.style.backgroundColor = "rgba(162, 217, 161, 0.4)";
-            } else {
-                flash.style.backgroundColor = "rgba(255, 154, 162, 0.4)";
-            }
-            
-            flash.style.display = 'block';
-            setTimeout(() => {
-                flash.style.display = 'none';
-                currentIdx++;
+                // 答對了：增加計數並閃爍綠光
+                correctCount++;
                 saveProgress();
-                nextQuestionLogic();
-            }, 500);
+                flash.style.backgroundColor = "rgba(162, 217, 161, 0.4)";
+                
+                flash.style.display = 'block';
+                setTimeout(() => {
+                    flash.style.display = 'none';
+                    checkProgress();
+                }, 500);
+            } else {
+                // 答錯了：不增加計數，閃爍紅光，然後換一題
+                flash.style.backgroundColor = "rgba(255, 154, 162, 0.4)";
+                flash.style.display = 'block';
+                setTimeout(() => {
+                    flash.style.display = 'none';
+                    generateNext(); // 換題但不加分
+                }, 500);
+            }
         }
 
         function resetGame() {
-            currentIdx = 1; score = 0;
+            correctCount = 0;
             saveProgress();
             document.getElementById('reward-overlay').style.display = 'none';
             generateNext();
         }
 
         window.onload = () => {
-            if(currentIdx > 50) {
+            if(correctCount >= 50) {
                 document.getElementById('reward-overlay').style.display = 'flex';
             } else {
                 generateNext();
