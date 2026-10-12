@@ -1,13 +1,19 @@
-# 九龍街頭 V0.82 — 3D 自由鏡頭技術測試版
+# 九龍街頭 V0.83 — 旺角街網校準版
 
-## 內容
-- 使用瀏覽器內建 WebGL 進行真正 3D 透視及深度渲染；不依賴 CDN、API Key 或付費服務。
-- 使用原有 OSM 旺角資料的道路中心線與建築輪廓。建築物為簡化方塊模型，樓高屬模擬，非真實數據。
-- 右側空白區單指拖動旋轉鏡頭、雙指捏合縮放；左側虛擬搖桿移動人物。
-- 桌面 WASD 移動、滑鼠拖動旋轉、滾輪縮放。
+## 已實作
+- 保留 V0.82 WebGL 3D 第三身鏡頭、360° 旋轉、雙指縮放、手機搖桿。
+- 建築外牆依照 OSM 多邊形輪廓建立（不再以建築 bounding box 取代）。
+- 加入北向固定小地圖、附近街道名稱、地標快速定位（定位至對應 OSM 道路附近，非精確 POI 入口）。
+- 顯示 OSM 授權標示。
 
-## 部署
-把 index.html、mongkok-map.json、manifest.webmanifest 一同放在 GitHub Pages Repository 根目錄。因為地圖透過 fetch 載入，不能直接以 file:// 開啟。
+## 限制
+- 道路中心線與建築輪廓為真實 OSM 資料；道路寬度是估計值，建築高度、顏色、外觀為模擬。
+- 地標定位以同名道路近中心點代替，非精準門牌地址。
+- 仍未有完整車輛、NPC、格鬥或任務。
+- 未有手機實機測試；只完成語法和封裝檢查。
 
-## 本版範圍及限制
-這是 3D 相機與 OSM 地圖的技術原型，不是原本 V0.81 的完整遊戲功能升級。舊版交通、NPC、格鬥、任務及存檔尚未移植。建築輪廓以包圍盒近似，未有精確多邊形擠出；尚未加入建築碰撞與相機遮擋。為控制手機負載，初步只繪製主角附近的地圖區域。尚未在真實手機瀏覽器測試。
+## 安裝
+解壓後把 index.html、mongkok-map.json、manifest.webmanifest 上傳 GitHub Pages repository 根目錄。開啟網站，不能直接用 file:// 雙擊 HTML。
+
+## 授權
+地圖資料 © OpenStreetMap contributors，Open Database License (ODbL) 1.0。https://www.openstreetmap.org/copyright
