@@ -1,27 +1,19 @@
-# 九龍街頭 V0.1 — 可玩技術原型
+# 九龍街頭 V0.2
 
-## 使用
-開啟 `index.html` 即可試玩，無須安裝套件、伺服器或 API Key。電腦以方向鍵/WASD 移動、E 上落車、R 重設位置；手機使用畫面按鈕。
+免費、無 API Key、純前端 2D 開放世界遊戲原型。
 
-## GitHub Pages 發布
-1. 在 GitHub 建立公開 Repository，例如 `kowloon-streets`。
-2. 將 `index.html` 上傳到 Repository 根目錄（README.md 可一併上傳）。
-3. 進入 Settings → Pages，Source 選 Deploy from a branch，Branch 選 main，資料夾選 /(root)，儲存。
-4. 等待 GitHub Pages 部署，打開 `https://你的帳號.github.io/kowloon-streets/`。
+## 功能
+- 手機觸控及電腦鍵盤（WASD / 方向鍵）
+- E 上落車；空白鍵煞車；R 重設位置
+- 交通車流、行人、建築碰撞、鏡頭跟隨
+- 小地圖、黃色任務標記、三站速遞任務、現金獎勵
+- localStorage 本機自動存檔
 
-## 目前已有
-- 可玩 2D 城市畫面、手機觸控及電腦鍵盤操作
-- 步行／駕駛切換、建築物碰撞、簡單移動車流
-- 跟隨鏡頭、街名提示、本機自動存檔
+## 重要限制
+此版本**仍然是示意街網**，不是已驗證的九龍道路 GIS 地圖。街名只作主題參考，不代表精確地理位置。警察及通緝暫未實作。遊戲亦未經全面跨瀏覽器實機測試。
 
-## 尚未完成（重要）
-- **街道網格是為測試而繪製的旺角風格示意圖，不是真實地理座標，也不是已匯入的 OpenStreetMap 資料。** 街名用作風格標示，位置並不準確。
-- 上落車為原型模式切換，未實作走近車輛、車輛佔用等邏輯。
-- 未有真實交通導航、警察、任務、NPC、PWA 離線快取、音效及完整九龍地圖。
+## GitHub Pages
+把 index.html、manifest.webmanifest 放在公開 repo 根目錄，Settings > Pages > Deploy from a branch > main / (root)。不需要 API Key 或建置步驟。
 
-## 下一階段
-1. 取得符合授權的 OpenStreetMap 九龍道路及建築資料，離線轉換成靜態 JSON。
-2. 依真實座標投影道路，建立可駕駛路網、路口及碰撞。
-3. 完善上落車、交通規則、行人、任務及分區載入。
-
-這是原創 Web App 技術原型，不含 Rockstar Games 或 GTA 的美術素材。
+## 授權
+本原型程式供專案使用；後續匯入 OSM 資料須依 ODbL 規定標示來源及履行相關義務。
