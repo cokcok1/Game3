@@ -1,24 +1,24 @@
-# 九龍街頭 V0.4 — 地圖資料管線原型
+# 九龍街頭 V0.5 — 輕量 2.5D 遊戲原型
 
-## 可玩內容
-沿用 V0.3：步行、駕駛、車流、NPC、速遞、警察追捕、車況、觸控、小地圖、本機存檔。新增可讀取本地 OSM 幾何 JSON 的**視覺地圖層**。不需 API Key。
+## 使用方法
+把 `index.html`、`manifest.webmanifest` 上傳到 GitHub Repository 根目錄；Settings → Pages → Deploy from a branch → main /(root)。無需 API Key、無需編譯或安裝依賴。
 
-## 地圖真實度與限制（請先閱讀）
-- **ZIP 沒有預先打包真實 OSM 地圖數據**，因此直接部署時仍會顯示示意街網。不能宣稱已完成真實旺角地圖。
-- 提供 Overpass 查詢及純 Python 轉檔工具。只需在開發時一次性取得公開 OSM 資料，遊戲運行時完全不需要 API。
-- 導入後會顯示按經緯度投影的道路及建築輪廓；**碰撞、交通、警車路徑、任務點仍使用舊版示意座標**，尚未與 OSM 幾何一致。現階段只用作視覺驗證，不是已完成真實地圖駕駛。
-- OSM 資料可能有缺漏，且道路寬度是遊戲估算值。
+## 功能
+- 2.5D 斜角投影、具高度的建築、窗戶及遮擋排序。
+- 立體感車輛：私家車、紅的士、綠頂小巴、雙層巴士簡化造型。
+- 車流沿車道中心偏移行駛，避免全部壓在線上；香港左側行車方向原型。
+- 有頭、身體、四肢和簡單步行動作的 NPC。
+- 步行、上落車、駕駛、建築碰撞、三站速遞任務、本機存檔、手機虛擬按鍵。
 
-## 如何匯入真實道路（選用）
-1. 開啟 https://overpass-turbo.eu/ ，貼入 `overpass-query.txt` 內容，按 Run，Export → raw data → download JSON，命名為 `mongkok-overpass.json`。
-2. 電腦有 Python 3 的話執行：`python3 convert_osm.py mongkok-overpass.json data/mongkok-map.json`。
-3. 將整個資料夾上傳 GitHub Pages；程式會自動載入 `data/mongkok-map.json`。唔需要申請 API Key。
+## 操作
+WASD / 方向鍵移動；E 上落車；空白鍵煞車；手機使用畫面按鈕。
 
-## GitHub Pages
-上傳整個專案內容到公開 GitHub Repository 根目錄，Settings → Pages → Deploy from a branch → main / (root)。如果未匯入 OSM，直接可玩示意版本。
+## 重要限制
+- **地圖仍是示意街網，非真實旺角街道座標。** 街名只是方向參考，不能當作真實地理位置。
+- 目前交通是沿直路的簡單原型，尚未有紅綠燈、路口轉彎、避車及完整交通規則。
+- 角色與車輛由 Canvas 程式繪製，並非完成的高精度美術資產。
+- V0.4 的警察追捕行為尚未移植到新的 2.5D 渲染版本，通緝 HUD 僅保留雛形。
+- 未做全面跨裝置瀏覽器實機測試。
 
-## 授權
-若加入 OSM 衍生地圖資料，須顯示 `© OpenStreetMap contributors`、ODbL 授權連結 https://www.openstreetmap.org/copyright ，並遵守 ODbL 相關條款。程式碼與地圖資料授權分開處理。
-
-## 已知問題
-本版只係地圖資料管線雛形；實機跨瀏覽器測試未完成。真實街網碰撞及導航係下一階段工作。
+## 後續
+優先處理真實 OSM 道路投影、建築多邊形、交通導航路徑、角色精細 Sprite 與性能優化。OpenStreetMap 衍生資料使用時須遵守 ODbL 及署名要求。
