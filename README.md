@@ -1,19 +1,18 @@
-# 九龍街頭 V0.83 — 旺角街網校準版
+# 九龍街頭 V0.86 — 香港交通 AI 測試版
 
-## 已實作
-- 保留 V0.82 WebGL 3D 第三身鏡頭、360° 旋轉、雙指縮放、手機搖桿。
-- 建築外牆依照 OSM 多邊形輪廓建立（不再以建築 bounding box 取代）。
-- 加入北向固定小地圖、附近街道名稱、地標快速定位（定位至對應 OSM 道路附近，非精確 POI 入口）。
-- 顯示 OSM 授權標示。
+手機／電腦 WebGL 3D 原型，GitHub Pages 靜態部署，毋須 API Key。
 
-## 限制
-- 道路中心線與建築輪廓為真實 OSM 資料；道路寬度是估計值，建築高度、顏色、外觀為模擬。
-- 地標定位以同名道路近中心點代替，非精準門牌地址。
-- 仍未有完整車輛、NPC、格鬥或任務。
-- 未有手機實機測試；只完成語法和封裝檢查。
+## 新增
+- 交通車輛沿 OSM 道路折線節點選擇下一段，能在部分路口轉彎，不再只在同一段道路來回瞬移。
+- 模擬左側車道偏移（依照行進方向），以及路口週期性紅燈等待（非真實燈號資料）。
+- 簡化前車避讓、加減速、車輛與 OSM 建築輪廓碰撞、主角與建築碰撞。
+- 下車前檢查位置是否穿入建築物。
+- 保留第三身 360° 鏡頭、雙指縮放、圓形搖桿、上落車、夜景、小地圖。
 
-## 安裝
-解壓後把 index.html、mongkok-map.json、manifest.webmanifest 上傳 GitHub Pages repository 根目錄。開啟網站，不能直接用 file:// 雙擊 HTML。
+## 部署
+將本 ZIP 所有檔案上傳 GitHub Pages repository 根目錄。請透過網站開啟，因為遊戲會 fetch `mongkok-map.json`。
 
-## 授權
-地圖資料 © OpenStreetMap contributors，Open Database License (ODbL) 1.0。https://www.openstreetmap.org/copyright
+## 已知限制
+道路節點連通性依賴 OSM 幾何，並非完整交通路由；紅綠燈按交匯點估算，並非現實位置及相位；沒有車道級 OSM 路線、行人過路燈、讓路規則或完整物理引擎。建築入口尚未加入，碰撞會暫時封閉建築。手機實機效能仍待測試。
+
+地圖資料：© OpenStreetMap contributors，ODbL，https://www.openstreetmap.org/copyright
